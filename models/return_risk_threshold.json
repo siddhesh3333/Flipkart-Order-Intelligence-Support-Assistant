@@ -1,0 +1,18 @@
+{
+    "t_rf": 0.5,
+    "precision": 0.32397408207343414,
+    "recall": 0.5494505494505495,
+    "f1": 0.4076086956521739,
+    "model": "RandomForestClassifier",
+    "selection_metric": "F1",
+    "threshold_range": [
+        0.1,
+        0.9
+    ],
+    "threshold_step": 0.01,
+    "source": "held_out_test_predict_proba",
+    "best_parameters": {
+        "classifier__max_depth": 6,
+        "classifier__n_estimators": 200
+    }
+}

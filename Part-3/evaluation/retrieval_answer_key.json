@@ -1,0 +1,50 @@
+[
+  {
+    "query": "Can I return a product after the return window expires?",
+    "relevant_document_ids": ["POL-001"]
+  },
+  {
+    "query": "What conditions must a product satisfy for a return?",
+    "relevant_document_ids": ["POL-001"]
+  },
+  {
+    "query": "Which products may not be eligible for return?",
+    "relevant_document_ids": ["POL-001"]
+  },
+  {
+    "query": "How do I request a return?",
+    "relevant_document_ids": ["POL-001"]
+  },
+  {
+    "query": "Can I return a product purchased from a different seller?",
+    "relevant_document_ids": ["POL-001"]
+  },
+  {
+    "query": "What happens if my return request is rejected?",
+    "relevant_document_ids": ["POL-001"]
+  },
+  {
+    "query": "What should I do if I receive a defective product?",
+    "relevant_document_ids": ["POL-007"]
+  },
+  {
+    "query": "When should I use the warranty process?",
+    "relevant_document_ids": ["POL-007"]
+  },
+  {
+    "query": "Can a damaged product be returned?",
+    "relevant_document_ids": ["POL-007"]
+  },
+  {
+    "query": "What should I do if the delivered product is different from what I ordered?",
+    "relevant_document_ids": ["POL-006"]
+  },
+  {
+    "query": "What should I do if I receive the wrong product?",
+    "relevant_document_ids": ["POL-006"]
+  },
+  {
+    "query": "How are replacement requests handled for incorrect products?",
+    "relevant_document_ids": ["POL-006"]
+  }
+]

@@ -1,0 +1,177 @@
+{
+  "evaluation": "policy_answerer",
+  "total_cases": 7,
+  "passed_cases": 7,
+  "failed_cases": 0,
+  "overall_pass_rate": 1.0,
+  "supported_cases": 5,
+  "supported_cases_passed": 5,
+  "supported_pass_rate": 1.0,
+  "unsupported_cases": 2,
+  "unsupported_cases_passed": 2,
+  "unsupported_pass_rate": 1.0,
+  "acceptance_criteria": {
+    "supported_queries_are_supported": true,
+    "supported_queries_are_grounded": true,
+    "supported_queries_have_sources": true,
+    "supported_queries_use_relevant_documents": true,
+    "unsupported_queries_are_rejected": true,
+    "unsupported_queries_are_not_marked_grounded": true,
+    "unsupported_queries_have_no_policy_sources": true
+  },
+  "results": [
+    {
+      "id": "A01",
+      "query": "Can I return a product after the return window expires?",
+      "expected_supported": true,
+      "actual_supported": true,
+      "grounded": true,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [
+        "POL-001",
+        "POL-003",
+        "POL-007"
+      ],
+      "expected_document_ids": [
+        "POL-001"
+      ],
+      "source_count": 5,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "Customers may request a return for an eligible product within the return window displayed on the product or order page. A return request must be submitted through the order support flow before the applicable return window expires. If the product is covered by a warranty, the warranty process may apply instead of or in addition to the standard return process. The applicable return window may differ by product category and seller. If an order cannot be cancelled because it has progressed too far in fulfillment, the customer may need to use the applicable return process after delivery if the product is eligible for return."
+    },
+    {
+      "id": "A02",
+      "query": "What conditions must a product satisfy for a return?",
+      "expected_supported": true,
+      "actual_supported": true,
+      "grounded": true,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [
+        "POL-001",
+        "POL-011"
+      ],
+      "expected_document_ids": [
+        "POL-001"
+      ],
+      "source_count": 5,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "Products must satisfy the applicable return-condition requirements for the return to be accepted. A return request may be rejected when the product is outside the eligible return period or does not satisfy the applicable return conditions. Customers may request a return for an eligible product within the return window displayed on the product or order page. Some products may be non-returnable because of product type, hygiene requirements, safety considerations, or seller-specific restrictions. Seller-specific conditions may affect return, exchange, warranty, delivery, and other order processes."
+    },
+    {
+      "id": "A03",
+      "query": "Which products may not be eligible for return?",
+      "expected_supported": true,
+      "actual_supported": true,
+      "grounded": true,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [
+        "POL-001",
+        "POL-007"
+      ],
+      "expected_document_ids": [
+        "POL-001"
+      ],
+      "source_count": 5,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "Some products may be non-returnable because of product type, hygiene requirements, safety considerations, or seller-specific restrictions. A return request may be rejected when the product is outside the eligible return period or does not satisfy the applicable return conditions. Products must satisfy the applicable return-condition requirements for the return to be accepted. Customers may request a return for an eligible product within the return window displayed on the product or order page. If the product is covered by a warranty, the warranty process may apply instead of or in addition to the standard return process."
+    },
+    {
+      "id": "A04",
+      "query": "What should I do if I receive a defective product?",
+      "expected_supported": true,
+      "actual_supported": true,
+      "grounded": true,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [
+        "POL-006",
+        "POL-007"
+      ],
+      "expected_document_ids": [
+        "POL-007"
+      ],
+      "source_count": 4,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "A defective product is a product that does not function or perform as expected under its applicable product conditions. A customer who receives a visibly damaged product should report the issue through the applicable order support flow as soon as possible. A defective product may be eligible for replacement, exchange, repair, refund, or another resolution depending on the applicable conditions. Customers should report a suspected defect through the order support process."
+    },
+    {
+      "id": "A05",
+      "query": "When should I use the warranty process?",
+      "expected_supported": true,
+      "actual_supported": true,
+      "grounded": true,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [
+        "POL-007",
+        "POL-010"
+      ],
+      "expected_document_ids": [
+        "POL-007",
+        "POL-010"
+      ],
+      "source_count": 3,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "Customers should review the warranty information associated with the product before submitting a warranty claim. If the product is covered by a warranty, the warranty process may apply instead of or in addition to the standard return process. Warranty coverage depends on the product, manufacturer, seller, and warranty terms applicable to the order."
+    },
+    {
+      "id": "A06",
+      "query": "What should I do if I receive the wrong product?",
+      "expected_supported": false,
+      "actual_supported": false,
+      "grounded": false,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [],
+      "expected_document_ids": [],
+      "source_count": 0,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "I could not find a sufficiently relevant policy for this question in the available policy documents. Please use the support option associated with the relevant order."
+    },
+    {
+      "id": "A07",
+      "query": "Can I change the color of my product after it has been delivered?",
+      "expected_supported": false,
+      "actual_supported": false,
+      "grounded": false,
+      "retrieved": 0,
+      "relevant": 0,
+      "source_document_ids": [],
+      "expected_document_ids": [],
+      "source_count": 0,
+      "support_match": true,
+      "grounded_check": true,
+      "sources_check": true,
+      "relevant_source_check": true,
+      "passed": true,
+      "answer": "I could not find a sufficiently relevant policy for this question in the available policy documents. Please use the support option associated with the relevant order."
+    }
+  ]
+}

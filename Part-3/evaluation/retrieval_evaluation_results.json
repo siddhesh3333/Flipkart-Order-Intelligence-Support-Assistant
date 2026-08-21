@@ -1,0 +1,164 @@
+{
+  "top_k": 3,
+  "num_queries": 12,
+  "mean_precision_at_3": 0.611111111111111,
+  "mean_recall_at_3": 0.8333333333333334,
+  "queries": [
+    {
+      "query": "Can I return a product after the return window expires?",
+      "relevant_documents": [
+        "POL-001"
+      ],
+      "retrieved_documents": [
+        "POL-001",
+        "POL-001",
+        "POL-007"
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "What conditions must a product satisfy for a return?",
+      "relevant_documents": [
+        "POL-001"
+      ],
+      "retrieved_documents": [
+        "POL-001",
+        "POL-001",
+        "POL-001"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "Which products may not be eligible for return?",
+      "relevant_documents": [
+        "POL-001"
+      ],
+      "retrieved_documents": [
+        "POL-001",
+        "POL-001",
+        "POL-001"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "How do I request a return?",
+      "relevant_documents": [
+        "POL-001"
+      ],
+      "retrieved_documents": [
+        "POL-001",
+        "POL-001",
+        "POL-001"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "Can I return a product purchased from a different seller?",
+      "relevant_documents": [
+        "POL-001"
+      ],
+      "retrieved_documents": [
+        "POL-001",
+        "POL-007",
+        "POL-001"
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "What happens if my return request is rejected?",
+      "relevant_documents": [
+        "POL-001"
+      ],
+      "retrieved_documents": [
+        "POL-001",
+        "POL-001",
+        "POL-001"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "What should I do if I receive a defective product?",
+      "relevant_documents": [
+        "POL-007"
+      ],
+      "retrieved_documents": [
+        "POL-007",
+        "POL-006",
+        "POL-007"
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "When should I use the warranty process?",
+      "relevant_documents": [
+        "POL-007"
+      ],
+      "retrieved_documents": [
+        "POL-010",
+        "POL-007",
+        "POL-010"
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "Can a damaged product be returned?",
+      "relevant_documents": [
+        "POL-007"
+      ],
+      "retrieved_documents": [
+        "POL-007",
+        "POL-006",
+        "POL-007"
+      ],
+      "precision_at_3": 0.6666666666666666,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "What should I do if the delivered product is different from what I ordered?",
+      "relevant_documents": [
+        "POL-006"
+      ],
+      "retrieved_documents": [
+        "POL-011",
+        "POL-005",
+        "POL-011"
+      ],
+      "precision_at_3": 0.0,
+      "recall_at_3": 0.0
+    },
+    {
+      "query": "What should I do if I receive the wrong product?",
+      "relevant_documents": [
+        "POL-006"
+      ],
+      "retrieved_documents": [
+        "POL-006",
+        "POL-007",
+        "POL-007"
+      ],
+      "precision_at_3": 0.3333333333333333,
+      "recall_at_3": 1.0
+    },
+    {
+      "query": "How are replacement requests handled for incorrect products?",
+      "relevant_documents": [
+        "POL-006"
+      ],
+      "retrieved_documents": [
+        "POL-004",
+        "POL-007",
+        "POL-004"
+      ],
+      "precision_at_3": 0.0,
+      "recall_at_3": 0.0
+    }
+  ]
+}
