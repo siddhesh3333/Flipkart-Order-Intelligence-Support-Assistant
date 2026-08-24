@@ -46,7 +46,8 @@ RAG_DIR = (
     / "rag"
 )
 
-sys.path.insert(0, str(RAG_DIR))
+if str(RAG_DIR) not in sys.path:
+    sys.path.insert(0, str(RAG_DIR))
 
 from answerer import PolicyAnswerer
 
@@ -59,51 +60,79 @@ TEST_CASES = [
 
     {
         "id": "A01",
-        "query": "Can I return a product after the return window expires?",
+        "query": (
+            "Can I return a product after the return window expires?"
+        ),
         "expected_supported": True,
-        "relevant_document_ids": ["POL-001"],
+        "relevant_document_ids": [
+            "POL-001"
+        ],
     },
 
     {
         "id": "A02",
-        "query": "What conditions must a product satisfy for a return?",
+        "query": (
+            "What conditions must a product satisfy for a return?"
+        ),
         "expected_supported": True,
-        "relevant_document_ids": ["POL-001"],
+        "relevant_document_ids": [
+            "POL-001"
+        ],
     },
 
     {
         "id": "A03",
-        "query": "Which products may not be eligible for return?",
+        "query": (
+            "Which products may not be eligible for return?"
+        ),
         "expected_supported": True,
-        "relevant_document_ids": ["POL-001"],
+        "relevant_document_ids": [
+            "POL-001"
+        ],
     },
 
     {
         "id": "A04",
-        "query": "What should I do if I receive a defective product?",
+        "query": (
+            "What should I do if I receive a defective product?"
+        ),
         "expected_supported": True,
-        "relevant_document_ids": ["POL-007"],
+        "relevant_document_ids": [
+            "POL-007"
+        ],
     },
 
     {
         "id": "A05",
-        "query": "When should I use the warranty process?",
+        "query": (
+            "When should I use the warranty process?"
+        ),
         "expected_supported": True,
-        "relevant_document_ids": ["POL-007", "POL-010"],
+        "relevant_document_ids": [
+            "POL-007",
+            "POL-010"
+        ],
     },
 
     {
         "id": "A06",
-        "query": "What should I do if I receive the wrong product?",
-        "expected_supported": False,
-        "relevant_document_ids": [],
+        "query": (
+            "What should I do if I receive the wrong product?"
+        ),
+        "expected_supported": True,
+        "relevant_document_ids": [
+            "POL-006"
+        ],
     },
 
     {
-    "id": "A07",
-    "query": "Can I change the color of my product after it has been delivered?",
-    "expected_supported": False,
-    "relevant_document_ids": [],
+        "id": "A07",
+        "query": (
+            "Can I change the color of my product "
+            "after it has been delivered?"
+        ),
+        "expected_supported": False,
+        "relevant_document_ids": [],
     },
 ]
 
@@ -113,42 +142,74 @@ TEST_CASES = [
 # ============================================================
 
 def get_document_ids(result):
+
     """
     Extract unique document IDs from answerer sources.
     """
 
-    sources = result.get("sources", [])
+    sources = result.get(
+        "sources",
+        []
+    )
 
     document_ids = []
 
     for source in sources:
 
-        document_id = source.get("document_id")
+        document_id = source.get(
+            "document_id"
+        )
 
         if document_id:
-            document_ids.append(document_id)
 
-    return sorted(set(document_ids))
+            document_ids.append(
+                document_id
+            )
+
+    return sorted(
+        set(document_ids)
+    )
 
 
-def evaluate_case(answerer, case):
+# ============================================================
+# CASE EVALUATION
+# ============================================================
+
+def evaluate_case(
+    answerer,
+    case
+):
 
     query = case["query"]
 
-    expected_supported = case["expected_supported"]
+    expected_supported = (
+        case["expected_supported"]
+    )
 
     relevant_documents = set(
         case["relevant_document_ids"]
     )
 
-    result = answerer.answer(query)
+    # --------------------------------------------------------
+    # Run answerer
+    # --------------------------------------------------------
+
+    result = answerer.answer(
+        query
+    )
 
     actual_supported = bool(
-        result.get("supported", False)
+        result.get(
+            "supported",
+            False
+        )
     )
 
     grounded = bool(
-        result.get("grounded", False)
+        result.get(
+            "grounded",
+            False
+        )
     )
 
     sources = result.get(
@@ -156,18 +217,21 @@ def evaluate_case(answerer, case):
         []
     )
 
+    # Use canonical count fields.
     retrieved = result.get(
-        "retrieved",
+        "retrieved_count",
         0
     )
 
     relevant = result.get(
-        "relevant",
+        "relevant_count",
         0
     )
 
     source_document_ids = set(
-        get_document_ids(result)
+        get_document_ids(
+            result
+        )
     )
 
     # --------------------------------------------------------
@@ -181,7 +245,9 @@ def evaluate_case(answerer, case):
             == expected_supported
         )
 
-        grounded_check = grounded
+        grounded_check = (
+            grounded is True
+        )
 
         sources_check = (
             len(sources) > 0
@@ -212,14 +278,10 @@ def evaluate_case(answerer, case):
             == expected_supported
         )
 
-        # Unsupported questions must not claim
-        # that the answer is grounded.
         grounded_check = (
             grounded is False
         )
 
-        # No policy source should be presented
-        # as evidence for an unsupported answer.
         sources_check = (
             len(sources) == 0
         )
@@ -238,30 +300,64 @@ def evaluate_case(answerer, case):
             relevant_source_check,
         ])
 
+    # --------------------------------------------------------
+    # Return detailed evaluation result
+    # --------------------------------------------------------
+
     return {
+
         "id": case["id"],
+
         "query": query,
-        "expected_supported": expected_supported,
-        "actual_supported": actual_supported,
-        "grounded": grounded,
-        "retrieved": retrieved,
-        "relevant": relevant,
-        "source_document_ids": sorted(
-            source_document_ids
-        ),
-        "expected_document_ids": sorted(
-            relevant_documents
-        ),
-        "source_count": len(sources),
-        "support_match": support_match,
-        "grounded_check": grounded_check,
-        "sources_check": sources_check,
-        "relevant_source_check": relevant_source_check,
-        "passed": passed,
-        "answer": result.get(
-            "answer",
-            ""
-        ),
+
+        "expected_supported":
+            expected_supported,
+
+        "actual_supported":
+            actual_supported,
+
+        "grounded":
+            grounded,
+
+        "retrieved":
+            retrieved,
+
+        "relevant":
+            relevant,
+
+        "source_document_ids":
+            sorted(
+                source_document_ids
+            ),
+
+        "expected_document_ids":
+            sorted(
+                relevant_documents
+            ),
+
+        "source_count":
+            len(sources),
+
+        "support_match":
+            support_match,
+
+        "grounded_check":
+            grounded_check,
+
+        "sources_check":
+            sources_check,
+
+        "relevant_source_check":
+            relevant_source_check,
+
+        "passed":
+            passed,
+
+        "answer":
+            result.get(
+                "answer",
+                ""
+            ),
     }
 
 
@@ -276,22 +372,34 @@ def main():
     print("=" * 70)
 
     print("\nTest cases:")
-    print(len(TEST_CASES))
+    print(
+        len(TEST_CASES)
+    )
 
     print("\nLoading answerer...")
 
     answerer = PolicyAnswerer()
 
-    print("\nAnswerer loaded successfully.")
+    print(
+        "\nAnswerer loaded successfully."
+    )
 
     results = []
+
+    # ========================================================
+    # RUN TEST CASES
+    # ========================================================
 
     for index, case in enumerate(
         TEST_CASES,
         start=1
     ):
 
-        print("\n" + "-" * 70)
+        print(
+            "\n"
+            + "-"
+            * 70
+        )
 
         print(
             f"Test {index}/{len(TEST_CASES)}"
@@ -312,36 +420,57 @@ def main():
             case
         )
 
-        results.append(result)
+        results.append(
+            result
+        )
 
         print(
             "Expected supported:",
-            result["expected_supported"]
+            result[
+                "expected_supported"
+            ]
         )
 
         print(
             "Actual supported  :",
-            result["actual_supported"]
+            result[
+                "actual_supported"
+            ]
         )
 
         print(
             "Grounded          :",
-            result["grounded"]
+            result[
+                "grounded"
+            ]
+        )
+
+        print(
+            "Retrieved          :",
+            result[
+                "retrieved"
+            ]
+        )
+
+        print(
+            "Relevant           :",
+            result[
+                "relevant"
+            ]
         )
 
         print(
             "Sources            :",
-            result["source_count"]
-        )
-
-        print(
-            "Relevant retrieved :",
-            result["relevant"]
+            result[
+                "source_count"
+            ]
         )
 
         print(
             "Source documents   :",
-            result["source_document_ids"]
+            result[
+                "source_document_ids"
+            ]
         )
 
         print(
@@ -355,7 +484,9 @@ def main():
     # METRICS
     # ========================================================
 
-    total = len(results)
+    total = len(
+        results
+    )
 
     passed = sum(
         1
@@ -363,18 +494,25 @@ def main():
         if result["passed"]
     )
 
-    failed = total - passed
+    failed = (
+        total
+        - passed
+    )
 
     supported_cases = [
         result
         for result in results
-        if result["expected_supported"]
+        if result[
+            "expected_supported"
+        ]
     ]
 
     unsupported_cases = [
         result
         for result in results
-        if not result["expected_supported"]
+        if not result[
+            "expected_supported"
+        ]
     ]
 
     supported_passed = sum(
@@ -414,31 +552,66 @@ def main():
     # ========================================================
 
     evaluation_output = {
-        "evaluation": "policy_answerer",
-        "total_cases": total,
-        "passed_cases": passed,
-        "failed_cases": failed,
-        "overall_pass_rate": overall_pass_rate,
-        "supported_cases": len(
-            supported_cases
-        ),
-        "supported_cases_passed": supported_passed,
-        "supported_pass_rate": supported_pass_rate,
-        "unsupported_cases": len(
-            unsupported_cases
-        ),
-        "unsupported_cases_passed": unsupported_passed,
-        "unsupported_pass_rate": unsupported_pass_rate,
+
+        "evaluation":
+            "policy_answerer",
+
+        "total_cases":
+            total,
+
+        "passed_cases":
+            passed,
+
+        "failed_cases":
+            failed,
+
+        "overall_pass_rate":
+            overall_pass_rate,
+
+        "supported_cases":
+            len(supported_cases),
+
+        "supported_cases_passed":
+            supported_passed,
+
+        "supported_pass_rate":
+            supported_pass_rate,
+
+        "unsupported_cases":
+            len(unsupported_cases),
+
+        "unsupported_cases_passed":
+            unsupported_passed,
+
+        "unsupported_pass_rate":
+            unsupported_pass_rate,
+
         "acceptance_criteria": {
-            "supported_queries_are_supported": True,
-            "supported_queries_are_grounded": True,
-            "supported_queries_have_sources": True,
-            "supported_queries_use_relevant_documents": True,
-            "unsupported_queries_are_rejected": True,
-            "unsupported_queries_are_not_marked_grounded": True,
-            "unsupported_queries_have_no_policy_sources": True,
+
+            "supported_queries_are_supported":
+                True,
+
+            "supported_queries_are_grounded":
+                True,
+
+            "supported_queries_have_sources":
+                True,
+
+            "supported_queries_use_relevant_documents":
+                True,
+
+            "unsupported_queries_are_rejected":
+                True,
+
+            "unsupported_queries_are_not_marked_grounded":
+                True,
+
+            "unsupported_queries_have_no_policy_sources":
+                True,
         },
-        "results": results,
+
+        "results":
+            results,
     }
 
     with OUTPUT_FILE.open(
@@ -457,48 +630,69 @@ def main():
     # FINAL REPORT
     # ========================================================
 
-    print("\n" + "=" * 70)
-    print("ANSWERER EVALUATION SUMMARY")
-    print("=" * 70)
-
     print(
-        f"\nTotal cases       : {total}"
+        "\n"
+        + "="
+        * 70
     )
 
     print(
-        f"Passed cases      : {passed}"
+        "ANSWERER EVALUATION SUMMARY"
     )
 
     print(
-        f"Failed cases      : {failed}"
+        "="
+        * 70
     )
 
     print(
-        f"Overall pass rate : {overall_pass_rate:.4f}"
+        f"\nTotal cases       : "
+        f"{total}"
     )
 
     print(
-        f"\nSupported cases   : {len(supported_cases)}"
+        f"Passed cases      : "
+        f"{passed}"
     )
 
     print(
-        f"Supported passed  : {supported_passed}"
+        f"Failed cases      : "
+        f"{failed}"
     )
 
     print(
-        f"Supported rate    : {supported_pass_rate:.4f}"
+        f"Overall pass rate : "
+        f"{overall_pass_rate:.4f}"
     )
 
     print(
-        f"\nUnsupported cases : {len(unsupported_cases)}"
+        f"\nSupported cases   : "
+        f"{len(supported_cases)}"
     )
 
     print(
-        f"Unsupported passed: {unsupported_passed}"
+        f"Supported passed  : "
+        f"{supported_passed}"
     )
 
     print(
-        f"Unsupported rate  : {unsupported_pass_rate:.4f}"
+        f"Supported rate    : "
+        f"{supported_pass_rate:.4f}"
+    )
+
+    print(
+        f"\nUnsupported cases : "
+        f"{len(unsupported_cases)}"
+    )
+
+    print(
+        f"Unsupported passed: "
+        f"{unsupported_passed}"
+    )
+
+    print(
+        f"Unsupported rate  : "
+        f"{unsupported_pass_rate:.4f}"
     )
 
     print(
@@ -509,10 +703,16 @@ def main():
         OUTPUT_FILE
     )
 
+    # ========================================================
+    # PASS / FAIL
+    # ========================================================
+
     if failed == 0:
 
         print(
-            "\n" + "=" * 70
+            "\n"
+            + "="
+            * 70
         )
 
         print(
@@ -520,13 +720,16 @@ def main():
         )
 
         print(
-            "=" * 70
+            "="
+            * 70
         )
 
     else:
 
         print(
-            "\n" + "=" * 70
+            "\n"
+            + "="
+            * 70
         )
 
         print(
@@ -534,7 +737,8 @@ def main():
         )
 
         print(
-            "=" * 70
+            "="
+            * 70
         )
 
 

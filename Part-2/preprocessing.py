@@ -11,8 +11,6 @@ from torchvision import transforms
 print("torchvision import successful")
 
 
-from torchvision import transforms
-
 
 # ============================================================
 # RESNET-18 PREPROCESSING CONFIGURATION

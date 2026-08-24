@@ -43,23 +43,19 @@ DEVICE = torch.device(
 def load_cached_features():
 
     train_features = torch.load(
-        FEATURE_DIR / "train_features.pt",
-        weights_only=True
-    )
+            FEATURE_DIR / "train_features.pt"
+        )
 
     train_labels = torch.load(
-        FEATURE_DIR / "train_labels.pt",
-        weights_only=True
-    )
+            FEATURE_DIR / "train_labels.pt"
+        )
 
     validation_features = torch.load(
-        FEATURE_DIR / "val_features.pt",
-        weights_only=True
+        FEATURE_DIR / "val_features.pt"
     )
 
     validation_labels = torch.load(
-        FEATURE_DIR / "val_labels.pt",
-        weights_only=True
+        FEATURE_DIR / "val_labels.pt"
     )
 
     return (

@@ -48,10 +48,9 @@ def build_final_model():
     # --------------------------------------------------------
 
     head_state_dict = torch.load(
-        HEAD_PATH,
-        map_location=DEVICE,
-        weights_only=True
-    )
+            HEAD_PATH,
+            map_location=DEVICE
+        )
 
     # --------------------------------------------------------
     # Put the trained head into ResNet-18

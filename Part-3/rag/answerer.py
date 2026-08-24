@@ -37,13 +37,17 @@ from retriever import PolicyRetriever
 
 DEFAULT_TOP_K = 5
 
-# Minimum semantic similarity required before evidence
-# can normally participate in the answer.
+# Minimum score required for a retrieved chunk
+# to participate in the final answer.
 MIN_SCORE = 0.50
 
-# Stronger threshold for deciding whether the question
-# has meaningful policy support.
+# Minimum score required for the strongest result
+# before a query can normally be considered supported.
 SUPPORT_SCORE = 0.55
+
+# Minimum number of query concepts that should match
+# the retrieved policy evidence.
+MIN_TERM_MATCHES = 1
 
 
 # ============================================================
@@ -60,7 +64,9 @@ class PolicyAnswerer:
     ):
 
         if top_k < 1:
-            raise ValueError("top_k must be >= 1.")
+            raise ValueError(
+                "top_k must be >= 1."
+            )
 
         if not 0 <= min_score <= 1:
             raise ValueError(
@@ -89,6 +95,8 @@ class PolicyAnswerer:
                 "Query must be a non-empty string."
             )
 
+        query = query.strip()
+
         # ----------------------------------------------------
         # Retrieve evidence
         # ----------------------------------------------------
@@ -109,13 +117,13 @@ class PolicyAnswerer:
         ]
 
         # ----------------------------------------------------
-        # Determine whether evidence is strong enough
+        # Determine support
         # ----------------------------------------------------
 
         supported = self._is_supported(
-            query,
-            retrieved,
-            relevant
+            query=query,
+            retrieved=retrieved,
+            relevant=relevant
         )
 
         # ----------------------------------------------------
@@ -134,17 +142,20 @@ class PolicyAnswerer:
                     "associated with the relevant order."
                 ),
 
-                "sources": self._format_sources(
-                    relevant
-                ),
+                "sources": [],
 
                 "grounded": False,
 
                 "supported": False,
 
+                # Explicit count fields.
                 "retrieved_count": len(retrieved),
+                "relevant_count": len(relevant),
 
-                "relevant_count": len(relevant)
+                # Backward-compatible aliases used by
+                # evaluation scripts.
+                "retrieved": len(retrieved),
+                "relevant": len(relevant)
             }
 
         # ----------------------------------------------------
@@ -168,9 +179,13 @@ class PolicyAnswerer:
 
             "supported": True,
 
+            # Explicit count fields.
             "retrieved_count": len(retrieved),
+            "relevant_count": len(relevant),
 
-            "relevant_count": len(relevant)
+            # Backward-compatible aliases.
+            "retrieved": len(retrieved),
+            "relevant": len(relevant)
         }
 
     # ========================================================
@@ -184,25 +199,25 @@ class PolicyAnswerer:
         relevant
     ):
 
+        # No retrieval result.
         if not retrieved:
             return False
 
+        # No sufficiently relevant evidence.
         if not relevant:
             return False
 
-        # Strongest retrieved result.
+        # ----------------------------------------------------
+        # Strongest retrieved result
+        # ----------------------------------------------------
+
         best_score = retrieved[0]["score"]
 
         if best_score < self.support_score:
             return False
 
         # ----------------------------------------------------
-        # Lightweight semantic keyword guard
-        #
-        # This is deliberately conservative. It prevents
-        # obviously unrelated policy text from being treated
-        # as an answer simply because the embedding similarity
-        # is moderately high.
+        # Query concept extraction
         # ----------------------------------------------------
 
         query_terms = self._important_terms(
@@ -212,33 +227,277 @@ class PolicyAnswerer:
         if not query_terms:
             return True
 
+        # ----------------------------------------------------
+        # Combine relevant policy text
+        # ----------------------------------------------------
+
         combined_text = " ".join(
             result["text"].lower()
             for result in relevant
         )
 
-        matched_terms = [
-            term
-            for term in query_terms
-            if term in combined_text
+        # Normalize text.
+        combined_text = re.sub(
+            r"[^a-z0-9\s]",
+            " ",
+            combined_text
+        )
+
+        combined_text = re.sub(
+            r"\s+",
+            " ",
+            combined_text
+        ).strip()
+
+        # ----------------------------------------------------
+        # Direct term matching
+        # ----------------------------------------------------
+
+        matched_terms = []
+
+        for term in query_terms:
+
+            if self._term_matches_text(
+                term,
+                combined_text
+            ):
+                matched_terms.append(term)
+
+        # ----------------------------------------------------
+        # Semantic concept aliases
+        #
+        # This handles cases where the query wording and
+        # policy wording are different.
+        #
+        # Example:
+        #
+        # "wrong product"
+        #
+        # may be represented in the policy as:
+        #
+        # "different from the product ordered"
+        # ----------------------------------------------------
+
+        if self._concept_match(
+            query,
+            combined_text
+        ):
+            return True
+
+        # ----------------------------------------------------
+        # Standard keyword requirement
+        # ----------------------------------------------------
+
+        return (
+            len(matched_terms)
+            >= MIN_TERM_MATCHES
+        )
+
+    # ========================================================
+    # TERM MATCHING
+    # ========================================================
+
+    def _term_matches_text(
+        self,
+        term,
+        text
+    ):
+
+        # Direct word match.
+        pattern = r"\b" + re.escape(term) + r"\b"
+
+        if re.search(
+            pattern,
+            text
+        ):
+            return True
+
+        # ----------------------------------------------------
+        # Basic morphological handling
+        # ----------------------------------------------------
+
+        variations = set()
+
+        if term.endswith("ed"):
+            variations.add(
+                term[:-2]
+            )
+
+        if term.endswith("ing"):
+            variations.add(
+                term[:-3]
+            )
+
+        if term.endswith("s"):
+            variations.add(
+                term[:-1]
+            )
+
+        for variation in variations:
+
+            if len(variation) < 4:
+                continue
+
+            pattern = (
+                r"\b"
+                + re.escape(variation)
+                + r"\w*"
+                + r"\b"
+            )
+
+            if re.search(
+                pattern,
+                text
+            ):
+                return True
+
+        return False
+
+    # ========================================================
+    # CONCEPT MATCHING
+    # ========================================================
+
+    def _concept_match(
+        self,
+        query,
+        combined_text
+    ):
+
+        query_lower = query.lower()
+
+        # ----------------------------------------------------
+        # Wrong / incorrect / different product
+        # ----------------------------------------------------
+
+        wrong_product_terms = [
+            "wrong product",
+            "incorrect product",
+            "different product",
+            "product is different",
+            "received the wrong",
+            "receive the wrong",
+            "wrong item",
+            "incorrect item",
+            "different item"
         ]
 
-        # At least one meaningful query concept should
-        # appear in the retrieved policy evidence.
-        return len(matched_terms) >= 1
+        if any(
+            phrase in query_lower
+            for phrase in wrong_product_terms
+        ):
+
+            policy_indicators = [
+                "different from the product ordered",
+                "different from the product",
+                "incorrect product",
+                "wrong product",
+                "product ordered",
+                "received a product"
+            ]
+
+            if any(
+                indicator in combined_text
+                for indicator in policy_indicators
+            ):
+                return True
+
+        # ----------------------------------------------------
+        # Defective product
+        # ----------------------------------------------------
+
+        defective_terms = [
+            "defective product",
+            "defective item",
+            "product is defective",
+            "received a defective"
+        ]
+
+        if any(
+            phrase in query_lower
+            for phrase in defective_terms
+        ):
+
+            if (
+                "defective product" in combined_text
+                or
+                "suspected defect" in combined_text
+                or
+                "defect" in combined_text
+            ):
+                return True
+
+        # ----------------------------------------------------
+        # Damaged product
+        # ----------------------------------------------------
+
+        damaged_terms = [
+            "damaged product",
+            "damaged item",
+            "product is damaged",
+            "received a damaged"
+        ]
+
+        if any(
+            phrase in query_lower
+            for phrase in damaged_terms
+        ):
+
+            if (
+                "damaged product" in combined_text
+                or
+                "visibly damaged" in combined_text
+                or
+                "damaged" in combined_text
+            ):
+                return True
+
+        # ----------------------------------------------------
+        # Warranty
+        # ----------------------------------------------------
+
+        if "warranty" in query_lower:
+
+            if (
+                "warranty" in combined_text
+                or
+                "warranty claim" in combined_text
+            ):
+                return True
+
+        # ----------------------------------------------------
+        # Return
+        # ----------------------------------------------------
+
+        if "return" in query_lower:
+
+            if (
+                "return" in combined_text
+                or
+                "non-returnable" in combined_text
+                or
+                "return request" in combined_text
+            ):
+                return True
+
+        return False
 
     # ========================================================
     # IMPORTANT QUERY TERMS
     # ========================================================
 
-    def _important_terms(self, query):
+    def _important_terms(
+        self,
+        query
+    ):
 
         stop_words = {
+
             "what",
             "when",
             "where",
             "which",
             "who",
+
             "how",
             "can",
             "could",
@@ -246,16 +505,20 @@ class PolicyAnswerer:
             "would",
             "may",
             "might",
+
             "do",
             "does",
             "did",
+
             "is",
             "are",
             "was",
             "were",
+
             "the",
             "a",
             "an",
+
             "to",
             "for",
             "of",
@@ -263,10 +526,27 @@ class PolicyAnswerer:
             "on",
             "in",
             "if",
+
             "my",
             "me",
             "i",
             "it",
+
+            "this",
+            "that",
+
+            "after",
+            "before",
+
+            "has",
+            "have",
+            "had",
+
+            "be",
+            "been",
+
+            "please",
+
             "product",
             "order"
         }
@@ -276,12 +556,18 @@ class PolicyAnswerer:
             query.lower()
         )
 
-        terms = [
-            word
-            for word in words
-            if len(word) >= 4
-            and word not in stop_words
-        ]
+        terms = []
+
+        for word in words:
+
+            if len(word) < 4:
+                continue
+
+            if word in stop_words:
+                continue
+
+            if word not in terms:
+                terms.append(word)
 
         return terms
 
@@ -296,9 +582,19 @@ class PolicyAnswerer:
 
         answer_lines = []
 
+        # ----------------------------------------------------
+        # Keep only the strongest evidence.
+        #
+        # This avoids producing long answers containing
+        # unrelated neighboring policy chunks.
+        # ----------------------------------------------------
+
         for result in relevant:
 
-            text = result["text"]
+            text = result["text"].strip()
+
+            if not text:
+                continue
 
             if text not in answer_lines:
 
@@ -367,6 +663,7 @@ def main():
 
         "What should I do if I receive the wrong product?",
 
+        "Can I change the color of my product after it has been delivered?"
     ]
 
     for query in test_queries:
@@ -385,12 +682,20 @@ def main():
 
         print("\nSOURCES:")
 
-        for source in result["sources"]:
+        if result["sources"]:
+
+            for source in result["sources"]:
+
+                print(
+                    f" - {source['document_id']} "
+                    f"| {source['chunk_id']} "
+                    f"| score={source['score']:.4f}"
+                )
+
+        else:
 
             print(
-                f" - {source['document_id']} "
-                f"| {source['chunk_id']} "
-                f"| score={source['score']:.4f}"
+                " - No sufficiently relevant sources."
             )
 
         print(

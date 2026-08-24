@@ -1,0 +1,102 @@
+{
+    "model_path": "F:\\MASAI CAPSTONE PROJECT\\Flipkart-Order-Intelligence-Support-Assistant\\models\\return_risk_model.pkl",
+    "threshold_path": "F:\\MASAI CAPSTONE PROJECT\\Flipkart-Order-Intelligence-Support-Assistant\\models\\return_risk_threshold.json",
+    "threshold": 0.5,
+    "selection_metric": "F1",
+    "model_validation": {
+        "required_features": {
+            "passed": true,
+            "required_features": [
+                "price_inr",
+                "discount_pct",
+                "customer_tenure_days",
+                "num_previous_orders",
+                "num_previous_returns",
+                "delivery_distance_km",
+                "delivery_days",
+                "is_weekend_order",
+                "rating_given",
+                "product_category",
+                "payment_method"
+            ],
+            "model_features": [
+                "price_inr",
+                "discount_pct",
+                "customer_tenure_days",
+                "num_previous_orders",
+                "num_previous_returns",
+                "delivery_distance_km",
+                "delivery_days",
+                "is_weekend_order",
+                "rating_given",
+                "product_category",
+                "payment_method"
+            ],
+            "missing_from_model": [],
+            "unexpected_model_features": []
+        },
+        "random_forest": {
+            "passed": true,
+            "classifier": "RandomForestClassifier",
+            "parameters": {
+                "n_estimators": 200,
+                "max_depth": 6,
+                "class_weight": "balanced"
+            }
+        },
+        "predict_proba": true
+    },
+    "bucket_definition": {
+        "low": "p < 0.50",
+        "medium": "0.50 <= p < 0.65",
+        "high": "p >= 0.65"
+    },
+    "total_cases": 4,
+    "passed_cases": 4,
+    "failed_cases": 0,
+    "pass_rate": 1.0,
+    "acceptance_checks_passed": true,
+    "overall_pass": true,
+    "results": [
+        {
+            "id": "R01",
+            "name": "Normal electronics order",
+            "probability": 0.42705957059608224,
+            "threshold": 0.5,
+            "medium_upper": 0.65,
+            "risk_bucket": "Low",
+            "expected": "Low",
+            "passed": true
+        },
+        {
+            "id": "R02",
+            "name": "Higher return-history order",
+            "probability": 0.5439534454379833,
+            "threshold": 0.5,
+            "medium_upper": 0.65,
+            "risk_bucket": "Medium",
+            "expected": "Medium",
+            "passed": true
+        },
+        {
+            "id": "R03",
+            "name": "Low-risk established customer",
+            "probability": 0.4125323434541121,
+            "threshold": 0.5,
+            "medium_upper": 0.65,
+            "risk_bucket": "Low",
+            "expected": "Low",
+            "passed": true
+        },
+        {
+            "id": "R04",
+            "name": "High-discount COD order",
+            "probability": 0.5643098066008754,
+            "threshold": 0.5,
+            "medium_upper": 0.65,
+            "risk_bucket": "Medium",
+            "expected": "Medium",
+            "passed": true
+        }
+    ]
+}

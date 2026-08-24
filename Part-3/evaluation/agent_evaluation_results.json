@@ -1,0 +1,70 @@
+{
+  "total_checks": 5,
+  "passed_checks": 5,
+  "failed_checks": 0,
+  "pass_rate": 1.0,
+  "overall_result": "PASSED",
+  "checks": [
+    {
+      "check": "Supported policy route",
+      "passed": true
+    },
+    {
+      "check": "Unsupported policy rejection",
+      "passed": true
+    },
+    {
+      "check": "Return-risk route",
+      "passed": true
+    },
+    {
+      "check": "Product-image route",
+      "passed": true
+    },
+    {
+      "check": "Invalid route rejection",
+      "passed": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "A01",
+      "type": "policy",
+      "passed": true,
+      "supported": true,
+      "grounded": true,
+      "source_count": 5
+    },
+    {
+      "id": "A02",
+      "type": "policy",
+      "passed": true,
+      "supported": false,
+      "grounded": false,
+      "source_count": 0
+    },
+    {
+      "id": "A03",
+      "type": "return_risk",
+      "passed": true,
+      "probability": 0.42705957059608224,
+      "risk_bucket": "Low",
+      "threshold": 0.5,
+      "model": "RandomForestClassifier"
+    },
+    {
+      "id": "A04",
+      "type": "product_image",
+      "passed": true,
+      "image": "F:\\MASAI CAPSTONE PROJECT\\Flipkart-Order-Intelligence-Support-Assistant\\data\\sample_images\\00_t-shirt-top.png",
+      "category": "T-shirt/top",
+      "class_index": 0,
+      "confidence": 0.9923961758613586
+    },
+    {
+      "id": "A05",
+      "type": "invalid",
+      "passed": true
+    }
+  ]
+}

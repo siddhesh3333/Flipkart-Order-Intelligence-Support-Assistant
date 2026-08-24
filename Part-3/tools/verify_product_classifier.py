@@ -51,8 +51,7 @@ model = build_model()
 
 state_dict = torch.load(
     MODEL_PATH,
-    map_location=DEVICE,
-    weights_only=True,
+    map_location=DEVICE
 )
 
 model.load_state_dict(state_dict)
