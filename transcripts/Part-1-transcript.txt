@@ -1,0 +1,47 @@
+Project: Flipkart Order Intelligence & Support Assistant
+Part: 1
+
+Overview
+- Part 1 focuses on return-risk prediction for Flipkart-style order data.
+- The goal is to build a reliable model that estimates the likelihood of a return and to save the trained artifact for downstream use by Part 3.
+
+History
+- The workflow begins with dataset profiling and preprocessing for the order dataset.
+- Missing values and feature patterns were reviewed to understand the return-rate signal.
+- A baseline logistic model and a Random Forest model were evaluated, with the Random Forest chosen as the final artifact for the Part-3 integration.
+
+Work_done
+- Analyzed the order dataset and confirmed the main problem shape: 6000 rows with 13 columns.
+- Reviewed return-rate behavior and feature gaps, including missingness in rating_given and payment-method-related patterns.
+- Trained and compared baseline and model-based classifiers.
+- Selected the Random Forest pipeline and saved the final model and threshold metadata for reuse.
+- Recorded acceptance summary details in Part-1/ACCEPTANCE.md.
+
+Technical_details
+- Dataset summary: 6000 rows, 13 columns, overall return rate around 22.75%.
+- Missingness review: rating_given had material missing values; payment_method effects were important for missingness classification.
+- Baseline testing: dummy baseline F1 (class = 1) was 0.0.
+- Logistic model performance: ROC-AUC around 0.6251, F1 around 0.3921, with best threshold around 0.44 improving recall by about 17.95 pp.
+- Random Forest was selected as the final model and saved to the project models directory.
+- Feature importance analysis identified payment_method_COD and price_inr as major contributors, with customer_tenure_days and delivery_distance_km also important in subgroup checks.
+- The saved threshold metadata is aligned with requirement-based selection and is used by the Part-3 tool layer.
+
+Important_files
+- Part-1/ACCEPTANCE.md
+- Part-1/logistic_model.py
+- Part-1/random_forest_model.py
+- Part-1/preprocess_data.py
+- Part-1/check_feature_importance.py
+- Part-1/check_logistic.py
+- Part-1/check_subgroups.py
+- Part-1/generate_orders.py
+- models/return_risk_model.pkl
+- models/return_risk_threshold.json
+
+Next_steps
+- Preserve the Part-1 model and threshold as the canonical return-risk artifact.
+- Keep the Part-3 tool integration pointed at the saved model rather than retraining or changing the threshold.
+- Use the acceptance summary as the validation reference for Part 1 completion.
+
+Checkpoint_title
+Part 1 return-risk modeling complete and ready for downstream integration

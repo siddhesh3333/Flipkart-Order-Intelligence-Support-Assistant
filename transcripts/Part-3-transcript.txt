@@ -1,0 +1,48 @@
+Project: Flipkart Order Intelligence & Support Assistant
+Part: 3
+
+Overview
+- Part 3 is the integration layer that combines the previously completed artifacts from Part 1 and Part 2 with a policy-grounded support workflow.
+- The final system routes user requests to three validated capabilities: policy answer retrieval, return-risk assessment, and product-image classification.
+
+History
+- The project already has a working return-risk model from Part 1 and a saved product classifier from Part 2.
+- Part 3 adds the orchestration layer and the RAG-based policy answerer without retraining or modifying the existing models.
+- The solution is designed to preserve compatibility with the previously validated artifacts while exposing a clear support-agent interface.
+
+Work_done
+- Integrated the policy-answering flow through a grounded retrieval-and-answer pipeline in Part-3/rag.
+- Added a return-risk tool that loads the real Part-1 Random Forest model and threshold metadata.
+- Added a product-image classification tool that loads the exact Part-2 saved model and uses the identical preprocessing pipeline.
+- Built the SupportAgent orchestrator in Part-3/agent/support_agent.py to route explicit request types.
+- Added evaluation scripts to validate policy grounding, return-risk inference, product classification, and support-agent orchestration.
+
+Technical_details
+- Request types supported by the agent: policy, return_risk, and product_image.
+- Policy route: the agent uses the local RAG pipeline with retrieval from policy text chunks and grounded answer generation.
+- Return-risk route: the tool reads the saved Random Forest model and threshold file from the project models directory; it predicts probability and assigns a risk bucket based on the Part-1 threshold selection logic.
+- Product-image route: the tool loads the same ResNet-18 classifier saved in Part 2 and uses the same preprocessing path.
+- The agent does not retrain models, hardcode thresholds, or replace validated artifacts. It routes traffic to the real implementations.
+- Acceptance checks validate supported vs unsupported policy questions, return-risk route behavior, and product-image tool routing.
+
+Important_files
+- Part-3/agent/support_agent.py
+- Part-3/rag/chunker.py
+- Part-3/rag/embedder.py
+- Part-3/rag/vector_store.py
+- Part-3/rag/retriever.py
+- Part-3/rag/answerer.py
+- Part-3/tools/return_risk_tool.py
+- Part-3/tools/product_classifier_tool.py
+- Part-3/evaluation/evaluate_answerer.py
+- Part-3/evaluation/evaluate_retrieval.py
+- Part-3/evaluation/evaluate_return_risk.py
+- Part-3/evaluation/evaluate_agent.py
+
+Next_steps
+- Keep Part 1 and Part 2 artifacts stable as the canonical data science foundations.
+- Continue validating Part 3 through the acceptance scripts before broader deployment.
+- If a user-facing interface is needed later, wrap the same support-agent logic without changing the underlying model contracts.
+
+Checkpoint_title
+Part 3 support-agent integration complete with grounded policy, return-risk, and image-classification routing

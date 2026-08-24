@@ -1,0 +1,46 @@
+Project: Flipkart Order Intelligence & Support Assistant
+Part: 2
+
+Overview
+- Part 2 focuses on product image classification for category recognition.
+- The goal is to build a transfer-learning image classifier that can identify product categories and save the final model for Part 3 integration.
+
+History
+- The workflow follows a vision-model pipeline using a pretrained ResNet-18 backbone with a Fashion-MNIST-style classification head.
+- The backbone is frozen and the classifier head is trained for the target taxonomy of product categories.
+- The final saved model is then used by the Part-3 product-classification tool.
+
+Work_done
+- Built the transfer-learning model architecture in Part-2/model.py.
+- Added preprocessing to normalize the image input pipeline in Part-2/preprocessing.py.
+- Created dataset loading and training logic in Part-2/load_dataset.py and Part-2/train_head.py.
+- Saved the trained classifier head and assembled the final full model in Part-2/save_final_model.py.
+- Evaluated the trained model using Part-2/evaluate.py and confirmed the inference path is compatible with the part-3 tool contract.
+
+Technical_details
+- Base architecture: pretrained ResNet-18, ImageNet weights, adapted to 10 output classes.
+- Labels correspond to Fashion-MNIST style categories: T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, and Ankle boot.
+- The model intentionally freezes the pretrained backbone and trains only the final classification head.
+- The persisted final artifact is stored as models/product_classifier.pt.
+- Preprocessing is designed to match the Part-3 classifier tool to avoid mismatches between the training and inference pipeline.
+
+Important_files
+- Part-2/model.py
+- Part-2/preprocessing.py
+- Part-2/load_dataset.py
+- Part-2/train_head.py
+- Part-2/save_final_model.py
+- Part-2/evaluate.py
+- Part-2/predict_single.py
+- models/product_classifier.pt
+- models/product_classifier_head.pt
+- reports/test_metrics.txt
+- reports/confusion_matrix.csv
+
+Next_steps
+- Keep the exact Part-2 model and preprocessing pipeline unchanged for Part 3.
+- Reuse the saved product-classification artifact in the support-agent integration without retraining.
+- Validate only through the exact verification scripts intended for the Part-3 classifier contract.
+
+Checkpoint_title
+Part 2 product image classifier complete and locked for integration with Part 3
